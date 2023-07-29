@@ -12,19 +12,24 @@ public class LoggingAspect {
 
     private Logger logger = Logger.getLogger(LoggingAspect.class.getName());
 
-    @Around("execution(* org.example.services.*.*(..))")
-    public Object log(ProceedingJoinPoint joinPoint) throws Throwable{
-        String methodName = joinPoint.getSignature().getName();
-        Object[] arguments = joinPoint.getArgs();
+    @Around("@annotation(ToLog)")
+    public Object log(ProceedingJoinPoint joinPoint){
+        try {
+            String methodName = joinPoint.getSignature().getName();
+            Object[] arguments = joinPoint.getArgs();
 
-        logger.info("Method " + methodName + " with patameters " + Arrays.asList(arguments) + " will execute");
+            logger.info("Method " + methodName + " with patameters " + Arrays.asList(arguments) + " will execute");
 
-        Comment comment = new Comment();
+       /* Comment comment = new Comment();
         comment.setText("Some text");
-        Object[] newArg = {comment};
-        Object returnMethodInfo = joinPoint.proceed(newArg);
-        logger.info("Method executed and returned " + returnMethodInfo);
-        return "FAILED";
+        Object[] newArg = {comment};*/
+            joinPoint.proceed();
+            //logger.info("Method executed and returned " + returnMethodInfo);
+            return "FAILED";
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
 }
